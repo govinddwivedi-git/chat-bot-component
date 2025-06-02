@@ -192,7 +192,7 @@ export const authAPI = {
 };
 
 export const chatAPI = {
-  async sendMessage(question: string, image?: File): Promise<string> {
+  async sendMessage(question: string, image?: File): Promise<any> {
     try {
       const formData = new FormData();
       formData.append('question', question);
@@ -201,7 +201,7 @@ export const chatAPI = {
         formData.append('image', image);
       }
 
-      const response: AxiosResponse<ApiResponse<string>> = await apiClient.post(
+      const response: AxiosResponse<ApiResponse<any>> = await apiClient.post(
         '/users/chat',
         formData,
         {
@@ -217,6 +217,18 @@ export const chatAPI = {
         throw new Error(error.response.data.message || 'Chat request failed');
       }
       throw new Error('Chat request failed');
+    }
+  },
+
+  async getChatHistory(): Promise<any[]> {
+    try {
+      const response: AxiosResponse<ApiResponse<any[]>> = await apiClient.get('/users/chat-history');
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(error.response.data.message || 'Failed to fetch chat history');
+      }
+      throw new Error('Failed to fetch chat history');
     }
   }
 };

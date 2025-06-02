@@ -5,15 +5,16 @@ A modern, responsive web application that provides an intelligent chatbot interf
 ## Features
 
 ### 🤖 AI Chat Interface
-- Real-time conversation with AI
-- Message history persistence
+- Real-time conversation with AI powered by Google Gemini
+- Message history persistence with MongoDB database integration
 - Typing indicators and smooth animations
 - Auto-scrolling chat interface
+- Image upload and analysis support with Cloudinary storage
 
 ### 🔐 User Authentication
-- User registration and login
+- User registration and login with JWT tokens
 - Protected routes for authenticated users
-- Persistent login sessions
+- Persistent login sessions with refresh tokens
 - User profile management
 
 ### 🎨 Modern UI/UX
@@ -24,16 +25,19 @@ A modern, responsive web application that provides an intelligent chatbot interf
 
 ### 📱 Core Pages
 - **Home**: Landing page with hero section and features
-- **Chat**: Main chat interface with AI
-- **History**: View past conversations
+- **Chat**: Main chat interface with AI and image analysis
+- **History**: View past conversations loaded from MongoDB database
 - **Profile**: Manage user account information
 - **Settings**: Customize app preferences
 - **About**: Information about the platform
 
 ### ⚙️ Additional Features
-- Local storage for data persistence
+- Full-stack database integration with MongoDB
+- Complete chat history persistence and retrieval
 - Error boundary for graceful error handling
 - Loading states and spinners
+- Image upload with AI analysis via Google Gemini
+- Cloudinary integration for image storage
 - Customizable settings (theme, notifications, etc.)
 
 ## Tech Stack

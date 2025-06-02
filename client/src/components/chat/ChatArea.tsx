@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -11,27 +11,48 @@ import {
   X
 } from 'lucide-react';
 import { ChatHistory, Message } from './ChatInterface';
+import { MarkdownMessage } from './MarkdownMessage';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { formatDateTime, formatDate } from '@/utils/dateUtils';
+
+interface UserInfo {
+  _id: string;
+  fullName: string;
+  email: string;
+}
 
 interface ChatAreaProps {
   currentChat?: ChatHistory;
   onSendMessage: (content: string, image?: File) => void;
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
+  userInfo: UserInfo | null;
 }
 
 export const ChatArea = ({ 
   currentChat, 
   onSendMessage, 
   sidebarOpen, 
-  onToggleSidebar 
+  onToggleSidebar,
+  userInfo 
 }: ChatAreaProps) => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [currentChat?.messages]);
 
   const handleSend = async () => {
     if (!message.trim() && !selectedImage) return;
@@ -92,11 +113,22 @@ export const ChatArea = ({
               <p className="text-xs text-gray-400">Always here to help</p>
             </div>
           </div>
+          {userInfo && (
+            <div className="ml-auto flex items-center space-x-2">
+              <div className="text-right">
+                <p className="text-sm text-white">{userInfo.fullName}</p>
+                <p className="text-xs text-gray-400">{formatDate(new Date())}</p>
+              </div>
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4 max-w-4xl mx-auto">
           {currentChat?.messages.length === 0 ? (
             <div className="text-center py-12">
@@ -112,7 +144,7 @@ export const ChatArea = ({
             </div>
           ) : (
             currentChat?.messages.map((msg) => (
-              <MessageBubble key={msg.id} message={msg} />
+              <MessageBubble key={msg.id} message={msg} userInfo={userInfo} />
             ))
           )}
           
@@ -199,12 +231,18 @@ export const ChatArea = ({
   );
 };
 
-const MessageBubble = ({ message }: { message: Message }) => {
+interface MessageBubbleProps {
+  message: Message;
+  userInfo: UserInfo | null;
+}
+
+const MessageBubble = ({ message, userInfo }: MessageBubbleProps) => {
   const isUser = message.sender === 'user';
+  const senderName = isUser ? (userInfo?.fullName || 'You') : 'AI Assistant';
   
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`flex items-start space-x-3 max-w-xs lg:max-w-md ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
+      <div className={`flex items-start space-x-3 max-w-xs lg:max-w-2xl ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
         <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
           isUser 
             ? 'bg-gradient-to-r from-blue-500 to-cyan-500' 
@@ -218,6 +256,14 @@ const MessageBubble = ({ message }: { message: Message }) => {
             ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-br-md' 
             : 'bg-gray-700 text-white rounded-bl-md'
         }`}>
+          <div className="flex items-center justify-between mb-1">
+            <p className={`text-xs font-medium ${isUser ? 'text-blue-100' : 'text-gray-300'}`}>
+              {senderName}
+            </p>
+            <p className={`text-xs ${isUser ? 'text-blue-100' : 'text-gray-400'}`}>
+              {formatDateTime(message.timestamp)}
+            </p>
+          </div>
           {message.image && (
             <img 
               src={message.image} 
@@ -225,10 +271,11 @@ const MessageBubble = ({ message }: { message: Message }) => {
               className="rounded-lg mb-2 max-w-full h-auto"
             />
           )}
-          <p className="text-sm leading-relaxed">{message.content}</p>
-          <p className={`text-xs mt-2 ${isUser ? 'text-blue-100' : 'text-gray-400'}`}>
-            {message.timestamp.toLocaleTimeString()}
-          </p>
+          {isUser ? (
+            <p className="text-sm leading-relaxed">{message.content}</p>
+          ) : (
+            <MarkdownMessage content={message.content} className="text-sm" />
+          )}
         </div>
       </div>
     </div>

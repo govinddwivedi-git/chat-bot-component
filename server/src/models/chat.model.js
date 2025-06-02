@@ -6,6 +6,12 @@ const chatSchema = new Schema({
         ref: "User",
         required: true
     },
+    title: {
+        type: String,
+        default: function() {
+            return this.chat.question.slice(0, 30) + (this.chat.question.length > 30 ? '...' : '');
+        }
+    },
     chat : {
         question : {
             type: String,

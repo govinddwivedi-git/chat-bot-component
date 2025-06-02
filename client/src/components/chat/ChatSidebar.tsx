@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
@@ -6,9 +5,16 @@ import {
   MessageSquare, 
   LogOut, 
   X,
-  Menu
+  User
 } from 'lucide-react';
 import { ChatHistory } from './ChatInterface';
+import { formatDate } from '@/utils/dateUtils';
+
+interface UserInfo {
+  _id: string;
+  fullName: string;
+  email: string;
+}
 
 interface ChatSidebarProps {
   isOpen: boolean;
@@ -19,6 +25,7 @@ interface ChatSidebarProps {
   onNewChat: () => void;
   onLogout: () => void;
   isMobile: boolean;
+  userInfo: UserInfo | null;
 }
 
 export const ChatSidebar = ({
@@ -30,6 +37,7 @@ export const ChatSidebar = ({
   onNewChat,
   onLogout,
   isMobile,
+  userInfo,
 }: ChatSidebarProps) => {
   if (!isOpen && isMobile) return null;
 
@@ -64,6 +72,19 @@ export const ChatSidebar = ({
               </Button>
             )}
           </div>
+
+          {/* User Info */}
+          {userInfo && (
+            <div className="flex items-center space-x-3 mb-4 p-3 bg-gray-700/50 rounded-lg">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-white truncate">{userInfo.fullName}</p>
+                <p className="text-xs text-gray-400 truncate">{userInfo.email}</p>
+              </div>
+            </div>
+          )}
           
           <Button
             onClick={onNewChat}
@@ -94,7 +115,7 @@ export const ChatSidebar = ({
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">{chat.title}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {chat.lastMessage.toLocaleDateString()}
+                      {formatDate(chat.lastMessage)}
                     </p>
                   </div>
                 </div>
