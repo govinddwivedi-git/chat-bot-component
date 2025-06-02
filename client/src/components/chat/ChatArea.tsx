@@ -198,7 +198,7 @@ export const ChatArea = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute right-1 top-1 text-gray-400 hover:text-white"
+                className="absolute right-1 top-1 text-gray-400 hover:bg-gradient-to-r from-purple-500 to-pink-500 hover:text-white"
                 disabled={isLoading}
               >
                 <ImagePlus className="h-4 w-4" />
@@ -208,7 +208,7 @@ export const ChatArea = ({
             <Button
               onClick={handleSend}
               disabled={(!message.trim() && !selectedImage) || isLoading}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 hover:cursor-pointer"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
