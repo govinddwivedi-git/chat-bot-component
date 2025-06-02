@@ -8,6 +8,10 @@ import { Chat } from "../models/chat.model.js";
 const chatResult = asyncHandler(async (req, res) => {
   const { question } = req.body;
   const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+
+  const config = {
+    responseMimeType: 'text/plain',
+  };
   
   let contents;
   let imageUrl = null;
@@ -43,6 +47,7 @@ const chatResult = asyncHandler(async (req, res) => {
 
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
+    config,
     contents: contents,
   });
 
