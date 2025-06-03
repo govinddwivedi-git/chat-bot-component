@@ -2,8 +2,11 @@
 import multer from "multer";
 import path from "path";
 
-// Set storage engine
-const storage = multer.diskStorage({
+// Use memory storage for serverless environments like Vercel
+const storage = multer.memoryStorage();
+
+// Alternative: Use disk storage for local development
+const diskStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./public/temp/");
   },
@@ -22,6 +25,15 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-export const upload = multer({ storage, fileFilter });
+// Use memory storage for production, disk storage for development
+const selectedStorage = process.env.NODE_ENV === 'production' ? storage : diskStorage;
+
+export const upload = multer({ 
+  storage: selectedStorage, 
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 
